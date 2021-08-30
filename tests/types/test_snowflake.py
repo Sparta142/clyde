@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 
 import pytest
 
-from clyde.models import Snowflake
+from clyde.types.snowflake import Snowflake, maybe_snowflake
 
 snowflakes = [
     Snowflake(175928847299117063),
@@ -71,3 +71,11 @@ def test_properties(snow):
 def test_conversions(snow):
     assert str(snow) == '175928847299117063'  # To int
     assert int(snow) == 175928847299117063  # To str
+
+
+def test_maybe_snowflake():
+    expected = Snowflake(175928847299117063)
+
+    assert maybe_snowflake('175928847299117063') == expected
+    assert maybe_snowflake(175928847299117063) == expected
+    assert maybe_snowflake(None) is None

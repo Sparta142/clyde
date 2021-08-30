@@ -1,9 +1,15 @@
 from datetime import datetime, timezone
-from typing import Union
+from typing import Union, overload
+
+RawSnowflake = Union[str, int]
+SnowflakeLike = Union['Snowflake', RawSnowflake]
 
 
 class Snowflake(int):
-    def __new__(cls, value: Union[int, str]) -> 'Snowflake':
+    def __new__(cls, value: SnowflakeLike) -> 'Snowflake':
+        if isinstance(value, Snowflake):
+            return value
+
         if not isinstance(value, (int, str)):
             raise TypeError(
                 f'Expected value to be int or str, but it was {type(value)}')
@@ -38,3 +44,17 @@ class Snowflake(int):
     @property
     def sequence(self) -> int:
         return self & 0xfff
+
+
+@overload
+def maybe_snowflake(value: None) -> None:
+    ...
+
+
+@overload
+def maybe_snowflake(value: SnowflakeLike) -> Snowflake:
+    ...
+
+
+def maybe_snowflake(value):
+    return None if value is None else Snowflake(value)
