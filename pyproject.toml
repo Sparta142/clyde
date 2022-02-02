@@ -6,7 +6,3 @@ build-backend = "setuptools.build_meta"
 show_error_codes = true
 warn_return_any = true
 warn_unused_configs = true
-
-[[tool.mypy.overrides]]
-module = ["nacl.*"]
-ignore_missing_imports = true
