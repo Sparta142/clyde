@@ -1,5 +1,7 @@
 from datetime import datetime, timezone
-from typing import Union, overload
+from typing import Union
+
+DISCORD_EPOCH = 1420070400000
 
 RawSnowflake = Union[str, int]
 SnowflakeLike = Union['Snowflake', RawSnowflake]
@@ -27,7 +29,7 @@ class Snowflake(int):
 
     @property
     def timestamp(self) -> int:
-        return (self >> 22) + 1420070400000
+        return (self >> 22) + DISCORD_EPOCH
 
     @property
     def time(self) -> datetime:
@@ -44,17 +46,3 @@ class Snowflake(int):
     @property
     def sequence(self) -> int:
         return self & 0xfff
-
-
-@overload
-def maybe_snowflake(value: None) -> None:
-    ...
-
-
-@overload
-def maybe_snowflake(value: SnowflakeLike) -> Snowflake:
-    ...
-
-
-def maybe_snowflake(value):
-    return None if value is None else Snowflake(value)

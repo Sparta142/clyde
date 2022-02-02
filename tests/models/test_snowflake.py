@@ -2,9 +2,9 @@ from datetime import datetime, timezone
 
 import pytest
 
-from clyde.types.snowflake import Snowflake, maybe_snowflake
+from clyde.models.snowflake import Snowflake
 
-snowflakes = [
+SNOWFLAKES = [
     Snowflake(175928847299117063),
     Snowflake('175928847299117063'),
 ]
@@ -57,7 +57,7 @@ def test_inequality():
     assert Snowflake('175928847299117063') != Snowflake('7792287155374570356')
 
 
-@pytest.mark.parametrize('snow', snowflakes)
+@pytest.mark.parametrize('snow', SNOWFLAKES)
 def test_properties(snow):
     assert snow.timestamp == 1462015105796
     assert snow.time == datetime(
@@ -67,15 +67,7 @@ def test_properties(snow):
     assert snow.sequence == 7
 
 
-@pytest.mark.parametrize('snow', snowflakes)
+@pytest.mark.parametrize('snow', SNOWFLAKES)
 def test_conversions(snow):
     assert str(snow) == '175928847299117063'  # To int
     assert int(snow) == 175928847299117063  # To str
-
-
-def test_maybe_snowflake():
-    expected = Snowflake(175928847299117063)
-
-    assert maybe_snowflake('175928847299117063') == expected
-    assert maybe_snowflake(175928847299117063) == expected
-    assert maybe_snowflake(None) is None
