@@ -14,7 +14,7 @@ USER_AGENT = (
 )
 
 
-class HTTPClient(object):
+class HTTPClient:
     def __init__(self, application_id: Snowflake) -> None:
         self.application_id = application_id
         self.base_url = f'{DISCORD_BASE_URL}/applications/{application_id!s}'

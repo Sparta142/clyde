@@ -14,7 +14,7 @@ from ..models.interactions import Interaction, InteractionType
 logger = logging.getLogger(__name__)
 
 
-class HTTPServer(object):
+class HTTPServer:
     def __init__(
         self,
         *,

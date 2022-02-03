@@ -6,7 +6,7 @@ from .http import HTTPClient, HTTPServer
 from .models.snowflake import Snowflake, SnowflakeLike
 
 
-class Application(object):
+class Application:
     def __init__(
         self,
         id: SnowflakeLike,
