@@ -1,5 +1,5 @@
 from datetime import datetime
-from enum import IntEnum, IntFlag
+from enum import Enum, IntFlag
 from typing import List, Optional, Union
 
 from pydantic import BaseModel
@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from .snowflake import Snowflake
 from .users import GuildMember, User
 
-# TODO: Remove these
+# TODO: Remove these, for testing only
 Role = object
 ChannelMention = object
 Attachment = object
@@ -23,41 +23,8 @@ StickerItem = object
 Sticker = object
 
 
-class Message(BaseModel):
-    id: Snowflake
-    channel_id: Snowflake
-    guild_id: Optional[Snowflake]
-    author: User
-    member: Optional[GuildMember]
-    content: str
-    timestamp: datetime
-    edited_timestamp: Optional[datetime]
-    tts: bool
-    mention_everyone: bool
-    mentions: List[User]
-    mention_roles: List[Role]
-    mention_channels: Optional[List[ChannelMention]]
-    attachments: List[Attachment]
-    embeds: List[Embed]
-    reactions: Optional[List[Reaction]]
-    nonce: Optional[Union[int, str]]
-    pinned: bool
-    webhook_id: Optional[Snowflake]
-    type: 'MessageType'
-    activity: Optional[MessageActivity]
-    application: Optional[Application]
-    application_id: Optional[Snowflake]
-    message_reference: Optional[MessageReference]
-    flags: Optional['MessageFlags']
-    referenced_message: Optional['Message']
-    interaction: Optional[MessageInteraction]
-    thread: Optional[Channel]
-    components: Optional[List[MessageComponent]]
-    sticker_items: Optional[List[StickerItem]]
-    stickers: Optional[List[Sticker]]
-
-
-class MessageType(IntEnum):
+# https://discord.com/developers/docs/resources/channel#message-object-message-types
+class MessageType(Enum):
     DEFAULT = 0
     RECIPIENT_ADD = 1
     RECIPIENT_REMOVE = 2
@@ -77,11 +44,13 @@ class MessageType(IntEnum):
     GUILD_DISCOVERY_GRACE_PERIOD_FINAL_WARNING = 17
     THREAD_CREATED = 18
     REPLY = 19
-    APPLICATION_COMMAND = 20
+    CHAT_INPUT_COMMAND = 20
     THREAD_STARTER_MESSAGE = 21
     GUILD_INVITE_REMINDER = 22
+    CONTEXT_MENU_COMMAND = 23
 
 
+# https://discord.com/developers/docs/resources/channel#message-object-message-flags
 class MessageFlags(IntFlag):
     CROSSPOSTED = 1 << 0
     """
@@ -121,3 +90,41 @@ class MessageFlags(IntFlag):
     """
     This message is an Interaction Response and the bot is "thinking".
     """
+
+
+# https://discord.com/developers/docs/resources/channel#message-object-message-structure
+class Message(BaseModel):
+    id: Snowflake
+    channel_id: Snowflake
+    guild_id: Optional[Snowflake]
+    author: User
+    member: Optional[GuildMember]
+    content: str
+    timestamp: datetime
+    edited_timestamp: Optional[datetime]
+    tts: bool
+    mention_everyone: bool
+    mentions: List[User]
+    mention_roles: List[Role]
+    mention_channels: Optional[List[ChannelMention]]
+    attachments: List[Attachment]
+    embeds: List[Embed]
+    reactions: Optional[List[Reaction]]
+    nonce: Optional[Union[int, str]]
+    pinned: bool
+    webhook_id: Optional[Snowflake]
+    type: MessageType
+    activity: Optional[MessageActivity]
+    application: Optional[Application]
+    application_id: Optional[Snowflake]
+    message_reference: Optional[MessageReference]
+    flags: Optional[MessageFlags]
+    referenced_message: Optional['Message']
+    interaction: Optional[MessageInteraction]
+    thread: Optional[Channel]
+    components: Optional[List[MessageComponent]]
+    sticker_items: Optional[List[StickerItem]]
+    stickers: Optional[List[Sticker]]
+
+
+Message.update_forward_refs()

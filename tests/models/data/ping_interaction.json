@@ -1,0 +1,14 @@
+{
+    "application_id": "881397058114826261",
+    "id": "938979083671441448",
+    "token": "A_TOKEN",
+    "type": 1,
+    "user": {
+        "avatar": "da25f18552f9a643f28e4bb0985ea31e",
+        "discriminator": "3161",
+        "id": "211377592895406081",
+        "public_flags": 256,
+        "username": "House"
+    },
+    "version": 1
+}

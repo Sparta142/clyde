@@ -1,91 +1,76 @@
-from enum import IntEnum, IntFlag
-from typing import List, Mapping, Optional, Union
+from enum import Enum
+from typing import Dict, List, Literal, Optional, Union
 
 from pydantic import BaseModel
 
+from .messages import Message, MessageFlags
 from .snowflake import Snowflake
 from .users import GuildMember, User
 
 # TODO: Remove these, for testing only
-Role = object
-Channel = object
-Message = dict
-Embed = object
 AllowedMentions = object
+Channel = object
 Component = object
+Embed = object
+InteractionDataOption = dict
+PartialChannel = dict
+PartialGuildMember = dict
+PartialMessage = dict
+Role = dict
+SelectOptionValue = dict
 
 
 # https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-type
-class InteractionType(IntEnum):
+class InteractionType(Enum):
     PING = 1
     APPLICATION_COMMAND = 2
     MESSAGE_COMPONENT = 3
     APPLICATION_COMMAND_AUTOCOMPLETE = 4
 
 
+# https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-types
+class ApplicationCommandType(Enum):
+    CHAT_INPUT = 1
+    USER = 2
+    MESSAGE = 3
+
+
+# https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-resolved-data-structure
 class ResolvedData(BaseModel):
-    users: Optional[Mapping[Snowflake, User]]
-    members: Optional[Mapping[Snowflake, GuildMember]]
-    roles: Optional[Mapping[Snowflake, Role]]
-    channels: Optional[Mapping[Snowflake, Channel]]
-    messages: Optional[Mapping[Snowflake, Message]]
+    users: Optional[Dict[Snowflake, User]]
+    members: Optional[Dict[Snowflake, PartialGuildMember]]
+    roles: Optional[Dict[Snowflake, Role]]
+    channels: Optional[Dict[Snowflake, PartialChannel]]
+    messages: Optional[Dict[Snowflake, PartialMessage]]
 
 
-class ApplicationCommandInteractionData(BaseModel):
-    class Type(IntEnum):
-        CHAT_INPUT = 1
-        """
-        Slash commands; a text-based command that shows up
-        when a user types ``/``.
-        """
-
-        USER = 2
-        """
-        A UI-based command that shows up when you
-        right click or tap on a user.
-        """
-
-        MESSAGE = 3
-        """
-        A UI-based command that shows up when you
-        right click or tap on a message.
-        """
-
-    class Option(BaseModel):
-        class Type(IntEnum):
-            SUB_COMMAND = 1
-            SUB_COMMAND_GROUP = 2
-            STRING = 3
-            INTEGER = 4  # Any integer between -2^53 and 2^53
-            BOOLEAN = 5
-            USER = 6
-            CHANNEL = 7  # Includes all channel types + categories
-            ROLE = 8
-            MENTIONABLE = 9  # Includes users and roles
-            NUMBER = 10  # Any double between -2^53 and 2^53
-
-        name: str
-        type: Type
-        value: Optional[object]  # TODO
-        options: Optional[List[object]]  # TODO
-
+# https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-data-structure
+class ApplicationCommandData(BaseModel):
     id: Snowflake
     name: str
-    type: Type
+    type: ApplicationCommandType
     resolved: Optional[ResolvedData]
-    options: Optional[List[Option]]
+    options: Optional[List[InteractionDataOption]]
     target_id: Optional[Snowflake]
 
 
-class ComponentInteractionData(BaseModel):
-    class Type(IntEnum):
-        ACTION_ROW = 1
-        BUTTON = 2
-        SELECT_MENU = 3
+# https://discord.com/developers/docs/interactions/message-components#component-object-component-types
+class ComponentType(Enum):
+    ACTION_ROW = 1
+    """ A container for other components. """
 
-    custom_id: str
-    component_type: Type
-    values: Optional[List[object]]
+    BUTTON = 2
+    """ A button object. """
+
+    SELECT_MENU = 3
+    """ A select menu for picking from choices. """
+
+
+# https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-data-structure
+class ComponentData(BaseModel):
+    custom_id: Optional[str]
+    component_type: Optional[ComponentType]
+    values: Optional[List[str]]
 
 
 # https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-structure
@@ -99,10 +84,7 @@ class Interaction(BaseModel):
     type: InteractionType
     """ The type of interaction. """
 
-    data: Optional[Union[
-        ApplicationCommandInteractionData,
-        ComponentInteractionData,
-    ]]
+    data: Optional[Union[ApplicationCommandData, ComponentData]]
     """ The command data payload. """
 
     guild_id: Optional[Snowflake]
@@ -120,7 +102,7 @@ class Interaction(BaseModel):
     token: str
     """ A continuation token for responding to the interaction. """
 
-    version: int
+    version: Literal[1]
     """ Read-only property, always ``1``. """
 
     message: Optional[Message]
@@ -141,7 +123,7 @@ class Interaction(BaseModel):
         return self.user is not None
 
 
-class InteractionCallbackType(IntEnum):
+class InteractionCallbackType(Enum):
     PONG = 1
     """ ACK a Ping. """
 
@@ -167,17 +149,12 @@ class InteractionCallbackType(IntEnum):
     """ Respond to an autocomplete interaction with suggested choices. """
 
 
-class InteractionCallbackDataFlags(IntFlag):
-    EPHEMERAL = 1 << 6
-    """ Only the user receiving the message can see it. """
-
-
 class InteractionCallbackData(BaseModel):
     tts: Optional[bool]
     content: Optional[str]
     embeds: Optional[List[Embed]]
     allowed_mentions: Optional[AllowedMentions]
-    flags: Optional[InteractionCallbackDataFlags]
+    flags: Optional[MessageFlags]
     components: Optional[Component]
 
 
