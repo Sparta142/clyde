@@ -1,5 +1,5 @@
 from datetime import datetime
-from enum import Enum, IntFlag
+from enum import IntEnum, IntFlag
 from typing import List, Optional, Union
 
 from pydantic import BaseModel
@@ -24,7 +24,7 @@ Sticker = object
 
 
 # https://discord.com/developers/docs/resources/channel#message-object-message-types
-class MessageType(Enum):
+class MessageType(IntEnum):
     DEFAULT = 0
     RECIPIENT_ADD = 1
     RECIPIENT_REMOVE = 2

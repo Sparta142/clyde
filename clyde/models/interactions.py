@@ -1,4 +1,4 @@
-from enum import Enum
+from enum import IntEnum
 from typing import Dict, List, Literal, Optional, Union
 
 from pydantic import BaseModel
@@ -21,7 +21,7 @@ SelectOptionValue = dict
 
 
 # https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-type
-class InteractionType(Enum):
+class InteractionType(IntEnum):
     PING = 1
     APPLICATION_COMMAND = 2
     MESSAGE_COMPONENT = 3
@@ -29,7 +29,7 @@ class InteractionType(Enum):
 
 
 # https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-types
-class ApplicationCommandType(Enum):
+class ApplicationCommandType(IntEnum):
     CHAT_INPUT = 1
     USER = 2
     MESSAGE = 3
@@ -55,7 +55,7 @@ class ApplicationCommandData(BaseModel):
 
 
 # https://discord.com/developers/docs/interactions/message-components#component-object-component-types
-class ComponentType(Enum):
+class ComponentType(IntEnum):
     ACTION_ROW = 1
     """ A container for other components. """
 
@@ -123,7 +123,7 @@ class Interaction(BaseModel):
         return self.user is not None
 
 
-class InteractionCallbackType(Enum):
+class InteractionCallbackType(IntEnum):
     PONG = 1
     """ ACK a Ping. """
 

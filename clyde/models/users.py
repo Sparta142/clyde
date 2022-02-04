@@ -1,5 +1,5 @@
 from datetime import datetime
-from enum import Enum, IntFlag
+from enum import IntEnum, IntFlag
 from typing import List, Optional
 
 from pydantic import BaseModel, validator
@@ -10,7 +10,7 @@ from .snowflake import Snowflake
 
 
 # https://discord.com/developers/docs/resources/user#user-object-premium-types
-class PremiumType(Enum):
+class PremiumType(IntEnum):
     NONE = 0
     NITRO_CLASSIC = 1
     NITRO = 2
