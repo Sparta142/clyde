@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 from typing import Union
 
+# A Unix timestamp in milliseconds
 DISCORD_EPOCH = 1420070400000
 
 RawSnowflake = Union[str, int]
@@ -8,6 +9,15 @@ SnowflakeLike = Union['Snowflake', RawSnowflake]
 
 
 class Snowflake(int):
+    """
+    Implements Twitter's Snowflake format for uniquely
+    identifiable descriptors (IDs).
+
+    Guaranteed to be unique across all of Discord,
+    except in some unique scenarios in which child objects
+    share their parent's ID.
+    """
+
     def __new__(cls, value: SnowflakeLike) -> 'Snowflake':
         if isinstance(value, Snowflake):
             return value
