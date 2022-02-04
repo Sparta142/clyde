@@ -153,11 +153,11 @@ class User(BaseModel):
     def avatar_url(self) -> Optional[str]:
         base_url = 'https://cdn.discordapp.com'
 
-        if self.avatar_url is None:
+        if self.avatar is None:
             num = int(self.discriminator) % 5
             return f'{base_url}/embed/avatars/{num}.png'
         else:
-            return f'{base_url}/avatars/{self.id}/user_avatar.png'
+            return f'{base_url}/avatars/{self.id}/{self.avatar}.png'
 
 
 # https://discord.com/developers/docs/resources/guild#guild-member-object
