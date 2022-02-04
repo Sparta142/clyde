@@ -5,6 +5,7 @@ from typing import List, Optional
 from pydantic import BaseModel, validator
 from pydantic.color import Color
 
+from .permissions import Permissions
 from .snowflake import Snowflake
 
 
@@ -192,7 +193,7 @@ class GuildMember(BaseModel):
     Membership Screening requirements.
     """
 
-    permissions: Optional[str]
+    permissions: Optional[Permissions]
     """
     Total permissions of the member in the channel,
     including overwrites, returned when in the interaction object.
