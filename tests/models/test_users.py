@@ -2,16 +2,8 @@ from clyde.models.users import GuildMember
 
 
 # https://discord.com/developers/docs/resources/guild#guild-member-object-example-guild-member
-def test_example_guild_member():
-    gm = GuildMember.parse_raw('''{
-  "user": {},
-  "nick": "NOT API SUPPORT",
-  "avatar": null,
-  "roles": [],
-  "joined_at": "2015-04-26T06:26:56.936000+00:00",
-  "deaf": false,
-  "mute": false
-}''')
+def test_example_guild_member(shared_datadir):
+    gm = GuildMember.parse_file(shared_datadir / 'guild_member.json')
 
     assert gm.avatar is None
     assert gm.communication_disabled_until is None
