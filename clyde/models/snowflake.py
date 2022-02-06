@@ -8,6 +8,7 @@ RawSnowflake = Union[str, int]
 SnowflakeLike = Union['Snowflake', RawSnowflake]
 
 
+# https://discord.com/developers/docs/reference#snowflakes
 class Snowflake(int):
     """
     Implements Twitter's Snowflake format for uniquely
@@ -17,6 +18,8 @@ class Snowflake(int):
     except in some unique scenarios in which child objects
     share their parent's ID.
     """
+
+    __slots__ = ()
 
     def __new__(cls, value: SnowflakeLike) -> 'Snowflake':
         if isinstance(value, Snowflake):
