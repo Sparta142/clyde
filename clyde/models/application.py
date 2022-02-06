@@ -10,6 +10,7 @@ from .team import Team
 from .users import User
 
 
+# https://discord.com/developers/docs/resources/application#application-object-application-structure
 class Application(BaseModel, arbitrary_types_allowed=True):
     id: Snowflake
     """ The id of the app. """

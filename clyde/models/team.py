@@ -7,11 +7,13 @@ from .snowflake import Snowflake
 from .users import User
 
 
+# https://discord.com/developers/docs/topics/teams#data-models-membership-state-enum
 class MembershipState(IntEnum):
     INVITED = 1
     ACCEPTED = 2
 
 
+# https://discord.com/developers/docs/topics/teams#data-models-team-member-object
 class TeamMember(BaseModel):
     membership_state: MembershipState
     """ The user's membership state on the team. """
@@ -31,6 +33,7 @@ class TeamMember(BaseModel):
         return v
 
 
+# https://discord.com/developers/docs/topics/teams#data-models-team-object
 class Team(BaseModel):
     """ A group of developers on Discord who want to collaborate on apps. """
 
