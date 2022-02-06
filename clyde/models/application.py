@@ -1,3 +1,4 @@
+from enum import IntFlag
 from typing import List, Optional
 
 from nacl.encoding import HexEncoder
@@ -8,6 +9,18 @@ from yarl import URL
 from .snowflake import Snowflake
 from .team import Team
 from .users import User
+
+
+# https://discord.com/developers/docs/resources/application#application-object-application-flags
+class ApplicationFlags(IntFlag):
+    GATEWAY_PRESENCE = 1 << 12
+    GATEWAY_PRESENCE_LIMITED = 1 << 13
+    GATEWAY_GUILD_MEMBERS = 1 << 14
+    GATEWAY_GUILD_MEMBERS_LIMITED = 1 << 15
+    VERIFICATION_PENDING_GUILD_LIMIT = 1 << 16
+    EMBEDDED = 1 << 17
+    GATEWAY_MESSAGE_CONTENT = 1 << 18
+    GATEWAY_MESSAGE_CONTENT_LIMITED = 1 << 19
 
 
 # https://discord.com/developers/docs/resources/application#application-object-application-structure
@@ -90,7 +103,7 @@ class Application(BaseModel, arbitrary_types_allowed=True):
     cover_image: Optional[str]
     """ The application's default rich presence invite cover image hash. """
 
-    flags: Optional[int]
+    flags: Optional[ApplicationFlags]
     """ The application's public flags. """
 
     @validator('verify_key', pre=True)
