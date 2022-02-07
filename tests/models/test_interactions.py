@@ -1,6 +1,9 @@
-from clyde.models.interactions import (ApplicationCommandData,
-                                       ApplicationCommandType, Interaction,
-                                       InteractionType)
+from clyde.models.interactions import (
+    ApplicationCommandData,
+    ApplicationCommandType,
+    Interaction,
+    InteractionType,
+)
 from clyde.models.permissions import Permissions
 from clyde.models.snowflake import Snowflake
 from clyde.models.users import UserFlags
