@@ -207,20 +207,15 @@ class GuildMember(BaseModel):
     """
 
     def __str__(self) -> str:
-        if self.nick:
-            return self.nick
-        elif self.user:
-            return str(self.user)
-        else:
-            return super().__str__()
+        return self.nick or str(self.user) or super().__str__()
 
     @property
     def timed_out(self) -> bool:
         """ Whether the user is currently timed out. """
-        if not self.communication_disabled_until:
-            return False
+        if self.communication_disabled_until:
+            return self.communication_disabled_until < datetime.now()
 
-        return self.communication_disabled_until < datetime.now()
+        return False
 
     @validator('user', allow_reuse=True, pre=True)
     def __validate_user(cls, value):  # noqa: N805

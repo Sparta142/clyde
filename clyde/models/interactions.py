@@ -13,9 +13,9 @@ Channel = object
 Component = object
 Embed = object
 InteractionDataOption = dict
-PartialChannel = dict
-PartialGuildMember = dict
-PartialMessage = dict
+PartialChannel = Channel
+PartialGuildMember = GuildMember
+PartialMessage = Message
 Role = dict
 SelectOptionValue = dict
 
@@ -73,6 +73,9 @@ class ComponentData(BaseModel):
     values: Optional[List[str]]
 
 
+InteractionData = Union[ApplicationCommandData, ComponentData]
+
+
 # https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object-interaction-structure
 class Interaction(BaseModel):
     id: Snowflake
@@ -84,7 +87,7 @@ class Interaction(BaseModel):
     type: InteractionType
     """ The type of interaction. """
 
-    data: Optional[Union[ApplicationCommandData, ComponentData]]
+    data: Optional[InteractionData]
     """ The command data payload. """
 
     guild_id: Optional[Snowflake]

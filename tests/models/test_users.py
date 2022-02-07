@@ -11,3 +11,5 @@ def test_example_guild_member(shared_datadir):
     assert not gm.deaf
     assert not gm.mute
     assert not gm.timed_out
+
+    assert str(gm) == 'NOT API SUPPORT'
