@@ -1,15 +1,18 @@
+import functools
+import json
 import logging
-from typing import Awaitable, Callable, Optional, Union
+from json import JSONEncoder
+from typing import Any, Optional, Union
 
 from aiohttp import web
-from aiohttp.web import HostSequence, Request, Response, middleware
-from aiohttp.web_exceptions import (HTTPBadRequest, HTTPNotFound,
-                                    HTTPUnauthorized)
-from aiohttp.web_response import StreamResponse
-from nacl.exceptions import BadSignatureError
+from aiohttp.web import HostSequence, Request, Response
+from aiohttp.web_exceptions import HTTPBadRequest
 from nacl.signing import VerifyKey
+from pydantic import BaseModel
 
+from ..interaction_handler import InteractionHandler
 from ..models.interactions import Interaction, InteractionType
+from .middleware import validate_signature
 
 logger = logging.getLogger(__name__)
 
@@ -25,11 +28,12 @@ class HTTPServer:
     ) -> None:
         self.host = host
         self.port = port
+        self.handler = InteractionHandler()
 
-        self._verify_key = VerifyKey(public_key)
-
-        self._app = web.Application(middlewares=[self._validate_signature])
-        self._app.add_routes([web.post(path, self._handle_interaction)])
+        self._app = web.Application(middlewares=[
+            validate_signature(VerifyKey(public_key)),
+        ])
+        self._app.router.add_post(path, self._handle_interaction)
 
     def run(self) -> None:
         web.run_app(
@@ -50,64 +54,39 @@ class HTTPServer:
         await self._app.shutdown()
 
     async def _handle_interaction(self, request: Request) -> Response:
+        # Parse the interaction from JSON
         try:
             obj = await request.json()
-            print(await request.read())
+            logger.debug('Received interaction: %r', await request.text())
             interaction = Interaction.parse_obj(obj)
         except Exception as e:
             logger.error('Failed to read interaction body')
             raise HTTPBadRequest(text='Invalid request') from e
 
+        # Delegate it to the proper handler coroutine
         if interaction.type == InteractionType.PING:
-            return await self._handle_ping(request, interaction)
+            data = await self.handler.handle_ping(interaction)
         elif interaction.type == InteractionType.APPLICATION_COMMAND:
-            return await self._handle_app_cmd(request, interaction)
+            data = await self.handler.handle_application_command(interaction)
         elif interaction.type == InteractionType.MESSAGE_COMPONENT:
-            return await self._handle_msg_component(request, interaction)
+            data = await self.handler.handle_message_component(interaction)
         else:
             raise HTTPBadRequest(text='Unknown interaction type')
 
-    async def _handle_ping(
-        self,
-        request: Request,
-        interaction: Interaction,
-    ) -> Response:
-        return web.json_response({'type': InteractionType.PING})
+        return web.json_response(data, dumps=_dumps_custom)
 
-    async def _handle_app_cmd(
-        self,
-        request: Request,
-        interaction: Interaction,
-    ) -> Response:
-        raise HTTPNotFound(text='Not implemented')
 
-    async def _handle_msg_component(
-        self,
-        request: Request,
-        interaction: Interaction,
-    ) -> Response:
-        raise HTTPNotFound(text='Not implemented')
+class PydanticJSONEncoder(JSONEncoder):
+    def default(self, o: Any) -> Any:
+        if isinstance(o, BaseModel):
+            return o.dict(exclude_unset=True)
 
-    @middleware
-    async def _validate_signature(
-        self,
-        request: Request,
-        handler: Callable[[Request], Awaitable[StreamResponse]],
-    ) -> StreamResponse:
-        try:
-            signature = request.headers['X-Signature-Ed25519']
-            timestamp = request.headers['X-Signature-Timestamp']
-        except KeyError as e:
-            raise HTTPUnauthorized(text='Missing signature') from e
+        return super().default(o)
 
-        # The signed message is the decoded body prefixed with the timestamp
-        body = await request.text()
-        smessage = (timestamp + body).encode()
 
-        try:
-            self._verify_key.verify(smessage, bytes.fromhex(signature))
-        except BadSignatureError as e:
-            raise HTTPUnauthorized(text='Invalid signature') from e
-
-        # Everything looks good, continue handling
-        return await handler(request)
+_dumps_custom = functools.partial(
+    json.dumps,
+    cls=PydanticJSONEncoder,
+    separators=(',', ':'),
+    indent=None,
+)
