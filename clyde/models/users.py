@@ -207,7 +207,7 @@ class GuildMember(BaseModel):
     """
 
     def __str__(self) -> str:
-        return self.nick or str(self.user) or super().__str__()
+        return str(self.user) or self.nick or super().__str__()
 
     @property
     def timed_out(self) -> bool:
