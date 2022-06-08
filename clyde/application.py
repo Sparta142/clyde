@@ -35,7 +35,7 @@ class ClydeApp:
         # Initialized by __aenter__
         self._session: aiohttp.ClientSession
         self._application: Application
-        self._webapp: web.Application
+        self._runner: web.AppRunner
 
     async def __aenter__(self) -> 'ClydeApp':
         self._session = aiohttp.ClientSession(
@@ -50,7 +50,7 @@ class ClydeApp:
 
     async def __aexit__(self, exc_type, exc, tb) -> None:
         await self._session.close()
-        # TODO: Server
+        await self._runner.cleanup()
 
     @property
     def application(self) -> Application:
@@ -101,24 +101,17 @@ class ClydeApp:
         port: Optional[int] = None,
     ) -> None:
         # Create aiohttp web application
-        self._webapp = web.Application(
+        webapp = web.Application(
             middlewares=[validate_signature(self._application.verify_key)],
         )
-        self._webapp.router.add_post('/', self._handle_post)
+        webapp.router.add_post('/', self._handle_post)
 
-        runner = web.AppRunner(self._webapp)
-        await runner.setup()
-        site = web.TCPSite(runner, host=host, port=port)
+        self._runner = web.AppRunner(webapp)
+        await self._runner.setup()
+
+        site = web.TCPSite(self._runner, host=host, port=port)
         await site.start()
-
-        # Sleep forever
-        if sys.platform == 'win32' and sys.version_info < (3, 8):
-            delay = 1
-        else:
-            delay = 3600
-
-        while True:
-            await asyncio.sleep(delay)
+        await self.__sleep_forever()
 
     async def _handle_post(self, request: web.Request) -> web.Response:
         # Parse the interaction from JSON
@@ -131,3 +124,13 @@ class ClydeApp:
             logger.debug('Incoming interaction: %r', interaction)
 
         return web.json_response(None)  # TODO
+
+    @staticmethod
+    async def __sleep_forever():
+        if sys.platform == 'win32' and sys.version_info < (3, 8):
+            delay = 1
+        else:
+            delay = 3600
+
+        while True:
+            await asyncio.sleep(delay)
