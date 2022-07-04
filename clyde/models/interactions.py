@@ -1,11 +1,18 @@
+import sys
 from enum import IntEnum
-from typing import Dict, List, Literal, Optional, Union
+from typing import Dict, List, Optional, Union
 
 from pydantic import BaseModel
 
 from .messages import Message, MessageFlags
 from .snowflake import Snowflake
 from .users import GuildMember, User
+
+if sys.version_info >= (3, 8):
+    from typing import Literal
+else:
+    from typing_extensions import Literal
+
 
 # TODO: Remove these, for testing only
 AllowedMentions = object

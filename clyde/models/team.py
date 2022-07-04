@@ -1,10 +1,16 @@
+import sys
 from enum import IntEnum
-from typing import List, Literal, Optional
+from typing import List, Optional
 
 from pydantic import BaseModel, validator
 
 from .snowflake import Snowflake
 from .users import User
+
+if sys.version_info >= (3, 8):
+    from typing import Literal
+else:
+    from typing_extensions import Literal
 
 
 # https://discord.com/developers/docs/topics/teams#data-models-membership-state-enum
