@@ -10,6 +10,7 @@ def test_is_valid(value):
     assert Locale.is_valid(value)
     assert Locale.is_valid(value.value)
 
+
 @pytest.mark.parametrize('value', [
     'en',
     'spanish',

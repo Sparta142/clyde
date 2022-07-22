@@ -1,13 +1,25 @@
-import functools
+from typing import Any
+
+_ENCODING = 'utf-8'
 
 try:
-    from orjson import dumps, loads
+    import orjson
+    from orjson import loads
+
+    def dumps_str(obj: Any) -> str:
+        return orjson.dumps(obj).decode(_ENCODING)
+
+    def dumps_bytes(obj: Any) -> bytes:
+        return orjson.dumps(obj)
 except ImportError:
-    from json import dumps as __json_dumps
+    import json
     from json import loads
 
-    @functools.wraps(__json_dumps)
-    def dumps(*args, **kwargs):
-        return __json_dumps(*args, **kwargs).encode('utf-8')
+    def dumps_str(obj: Any) -> str:
+        return json.dumps(obj)
 
-__all__ = ['dumps', 'loads']
+    def dumps_bytes(obj: Any) -> bytes:
+        return json.dumps(obj).encode(_ENCODING)
+
+
+__all__ = ['dumps_bytes', 'dumps_str', 'loads']
