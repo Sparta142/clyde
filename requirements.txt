@@ -24,6 +24,6 @@ pytest==6.2.5
 six==1.16.0
 toml==0.10.2
 tox==3.24.5
-typing_extensions==4.0.1
+typing_extensions==4.3.0
 virtualenv==20.13.0
 yarl==1.7.2
