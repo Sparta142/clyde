@@ -1,5 +1,4 @@
 import functools
-import json
 import logging
 from json import JSONEncoder
 from typing import Any, Optional, Union
@@ -9,6 +8,8 @@ from aiohttp.web import HostSequence, Request, Response
 from aiohttp.web_exceptions import HTTPBadRequest
 from nacl.signing import VerifyKey
 from pydantic import BaseModel
+
+from clyde.internal.json import dumps_str
 
 from ..interaction_handler import InteractionHandler
 from ..models.interactions import Interaction, InteractionType
@@ -85,7 +86,7 @@ class PydanticJSONEncoder(JSONEncoder):
 
 
 _dumps_custom = functools.partial(
-    json.dumps,
+    dumps_str,
     cls=PydanticJSONEncoder,
     separators=(',', ':'),
     indent=None,

@@ -5,6 +5,7 @@ from aiohttp.payload import BytesPayload
 from clyde.internal.json import dumps_bytes
 
 
+# Like aiohttp.payload.JsonPayload but optimized when orjson is available
 class JsonPayload(BytesPayload):
     def __init__(
         self,
